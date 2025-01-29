@@ -1,0 +1,32 @@
+1. Advanced Thread-per-Task
+
+
+Write a program that:
+Simulates a hospital emergency room.
+Each patient arriving creates a new thread.
+The thread simulates the patient being treated for a random duration (2–5 seconds).
+After treatment, the thread terminates.
+Ensure that no more than 10 patients can be treated simultaneously.
+
+
+
+
+
+2. Thread Pool with Dynamic Task Queue
+Implement a thread pool with the following requirements:
+Tasks involve calculating factorials for a set of numbers provided as input.
+
+The thread pool has only 5 threads.
+New tasks can be added to the queue dynamically by a separate thread (simulating new tasks arriving in real-time).
+Add logging to track:
+When a thread picks up a task.
+When a task is completed.
+The current size of the task queue.
+
+
+
+3. Hybrid Thread Model
+Write a program to simulate a cloud computing platform:
+Critical tasks (VIP users' computations) are handled using Thread-per-Task.
+Routine tasks (regular users' computations) are handled using a Thread Pool of size 10.
+VIP tasks should always take priority over routine tasks.

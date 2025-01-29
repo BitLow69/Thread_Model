@@ -1,0 +1,13 @@
+21:19:15 : Thread 6133559296 have clauclated the factorial of 1 to be 1
+21:19:15 : Thread 6135279616 have clauclated the factorial of 2 to be 2
+21:19:15 : Thread 6134706176 have clauclated the factorial of 2 to be 2
+21:19:15 : Thread 6135853056 have clauclated the factorial of 3 to be 6
+21:19:15 : Thread 6134132736 have clauclated the factorial of 4 to be 24
+21:19:16 : Thread 6135279616 have clauclated the factorial of 4 to be 24
+21:19:16 : Thread 6134706176 have clauclated the factorial of 5 to be 120
+21:19:16 : Thread 6133559296 have clauclated the factorial of 5 to be 120
+21:19:16 : Thread 6135853056 have clauclated the factorial of 6 to be 720
+21:19:16 : Thread 6134132736 have clauclated the factorial of 6 to be 720
+21:19:17 : Thread 6133559296 have clauclated the factorial of 7 to be 5040
+21:19:17 : Thread 6135279616 have clauclated the factorial of 7 to be 5040
+21:19:17 : Thread 6134706176 have clauclated the factorial of 7 to be 5040
