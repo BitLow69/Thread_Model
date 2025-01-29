@@ -28,7 +28,6 @@ void *ran(void *args){
     
 }
 int prime(int i){
-    srand(time(NULL));
     if (i==1 || i<1){
         return 0;
     }
@@ -78,10 +77,14 @@ void *sum(void *args){
 }
 
 int main(void){
+    srand(time(NULL));
     pthread_t th[3];
     pthread_create(&th[0],NULL,ran,NULL);
-    pthread_create(&th[0],NULL,isprime,NULL);
-    pthread_create(&th[0],NULL,sum,NULL);
+    pthread_create(&th[1],NULL,isprime,NULL);
+    pthread_create(&th[2],NULL,sum,NULL);
+    pthread_join(th[0],NULL);
+    pthread_join(th[1],NULL);
+    pthread_join(th[2],NULL);
     printf("Random Array : ");
     for (int i=0;i<SIZE;i++){
         printf(" %d \t ",array[i]);
@@ -93,5 +96,6 @@ int main(void){
 
     }
     printf("\n the sum of the random array is %d \n",array_sum);
+
 
 }
