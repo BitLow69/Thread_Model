@@ -70,7 +70,7 @@ struct file_info dequeue(){
 
 
 void* consumer(void* args){
-    while(!terminate){
+    while(!terminate && count!=0){
     struct file_info a=dequeue();
     printf("Consumer: consumer have used the file %d with size %d \n",a.file_id,a.size);
     }
@@ -81,7 +81,7 @@ void *producer(void * args){
     for (int i=0;i<10;i++){
         int file_size=rand()%100;
         enqueue(i,file_size);
-        printf("Producer: have stored the file %d with size %d mb\n",i,file_size);
+        printf("Producer: have stored the file %d with size %d mb\n",i,file _size);
     }
     terminate=1;
     return NULL;
