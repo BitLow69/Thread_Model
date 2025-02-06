@@ -27,8 +27,6 @@ pthread_cond_t polisher_cond;
 #define DRYERS 3
 #define POLISHERS 2
 
-
-int queue_size=0;
 struct cars{
     int car_numbers;
 };
@@ -43,10 +41,10 @@ void enqueue(pthread_mutex_t *lock,pthread_cond_t *en,pthread_cond_t *de,struct 
     queue_array[*rear]=data;
     (*count)++;
     *rear=((*rear+1)%QUEUE_SIZE);
-  
+  pthread_cond_broadcast(de);
     pthread_mutex_unlock(lock);
     // printf("have reached hearer\n");
-      pthread_cond_signal(de);
+      
 
 }
 
@@ -62,8 +60,9 @@ struct cars dequeu(pthread_mutex_t *lock,pthread_cond_t *en,pthread_cond_t *de,s
     struct cars a=queue_array[*front];
     (*count)-- ;
     *front=(*front+1)%QUEUE_SIZE;
+    pthread_cond_broadcast(en);
     pthread_mutex_unlock(lock);
-    pthread_cond_signal(en);
+    
     
     return a;
 
@@ -107,19 +106,26 @@ pthread_cond_t polisher_cond=PTHREAD_COND_INITIALIZER;
 //first worker they work when the car arrive at the station 
 void* washers_func(void* args){
     
-    while(dirty_car>0){
-        // printf("here \n");
+    while(1){
         pthread_mutex_lock(&washer_mutex);
+        if (dirty_car<=0){
+            printf("already reched in the dirtryc-ar\n");
+            pthread_cond_broadcast(&dryer_cond);
+            pthread_mutex_unlock(&washer_mutex);
+            break;
+        }
+        // printf("here \n");
+        
         int car_number=rand()%10000+1000;//number have been provided while car is runnig 
         struct cars car;
         car.car_numbers=car_number;
 
 
         enqueue(&car_wash_queue,&car_wash_queue_enqueue_cond,&car_wash_queue_dequeue_cond,car_wash,car,&car_wash_count,&car_wash_rear,&car_wash_front);
-                printf("%d car have been washed \n",car.car_numbers);
+        printf("%d car have been washed \n",car.car_numbers);
 
         dirty_car--;
-        pthread_cond_signal(&dryer_cond);
+        pthread_cond_broadcast(&dryer_cond);
         pthread_mutex_unlock(&washer_mutex);
 
     }
@@ -128,18 +134,27 @@ void* washers_func(void* args){
 // they wwork only when there are car that are already washed
 void* dryers_func(void* args){
 
-    while(tobedryiedcar>0){
-        //  printf("here  driyer \n");
+    while(1){
+
         pthread_mutex_lock(&dryer_mutex);
-        while(car_wash_count==0){
+        
+        while(car_wash_count==0 && tobedryiedcar>0){
+            
             pthread_cond_wait(&dryer_cond,&dryer_mutex);
 
+        }
+        if (tobedryiedcar<=0){
+    
+            pthread_cond_broadcast(&polisher_cond);
+            pthread_mutex_unlock(&dryer_mutex);
+            pthread_cond_broadcast(&polisher_cond);
+            break;
         }
 
     struct cars car=dequeu(&car_wash_queue,&car_wash_queue_enqueue_cond,&car_wash_queue_dequeue_cond,car_wash,&car_wash_count,&car_wash_rear,&car_wash_front);
     printf("%d car have been dried\n",car.car_numbers);
     enqueue(&car_dry_queue,&car_dry_queue_enqueue_cond,&car_dry_queue_dequeue_cond,dry_wash,car,&car_dry_count,&car_dry_rear,&car_dry_front);
-    pthread_cond_signal(&polisher_cond);
+    pthread_cond_broadcast(&polisher_cond);
     tobedryiedcar--;
     pthread_mutex_unlock(&dryer_mutex);
 
@@ -150,15 +165,20 @@ void* dryers_func(void* args){
 }
 // they work only  when the car have been washed adn dried
 void* polisher_func(void* args){
-    while(tobepolishedcar>0){
+    while(1){   
          pthread_mutex_lock(&polisher_mutex);
-        while(car_dry_count==0){
+        
+        while(car_dry_count==0 && tobepolishedcar>0){
             pthread_cond_wait(&polisher_cond,&polisher_mutex);
 
         }
+         if (tobepolishedcar<=0){
+            pthread_mutex_unlock(&polisher_mutex);
+            break;
+         }
         struct cars car=dequeu(&car_dry_queue,&car_dry_queue_enqueue_cond,&car_dry_queue_dequeue_cond,dry_wash,&car_dry_count,&car_dry_rear,&car_dry_front);
         printf("%d car have been polished \n",car.car_numbers);
-        // printf("%d\n",car_dry_count);
+
         tobepolishedcar--;
         pthread_mutex_unlock(&polisher_mutex);
     
@@ -193,8 +213,7 @@ int main(){
     for (int i=0;i<DRYERS;i++){
         pthread_join(dryer[i],NULL);
     }
-
-
+    printf("queue size after operiaon is %d\n",car_dry_count);
 }
 
 
